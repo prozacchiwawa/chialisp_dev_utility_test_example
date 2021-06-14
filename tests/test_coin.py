@@ -28,29 +28,29 @@ class CoinTests(TestGroup):
         self.network.skip_time('10s', farmer=bob)
 
         # Check that the bundle can be launched
-        hwcoin = alice.launch_contract(coin_source, amt=self.coin_amount)
-        assert hwcoin
+        time_coin = alice.launch_contract(coin_source, amt=self.coin_amount)
+        assert time_coin
 
         # Return the contract's new coin and the actors.
-        return hwcoin, alice, bob
+        return time_coin, alice, bob
 
     # Check that bob can't spend the coin right away.
     def test_bob_cant_spend(self):
-        hwcoin, alice, bob = self.start_test()
+        time_coin, alice, bob = self.start_test()
         bob_start_balance = bob.balance()
 
-        res = bob.spend_coin(hwcoin)
+        res = bob.spend_coin(time_coin)
 
         assert res.error
         assert bob.balance() <= bob_start_balance
 
     # Check that alice cna spend the coin right away.
     def test_alice_can_recover(self):
-        hwcoin, alice, bob = self.start_test()
+        time_coin, alice, bob = self.start_test()
         alice_start_balance = alice.balance()
 
         # Check that alice can spend before 2 days.
-        res = alice.spend_coin(hwcoin, args=[alice.puzzle_hash])
+        res = alice.spend_coin(time_coin, args=[alice.puzzle_hash])
         alice_payment = res.find_standard_coins(alice.puzzle_hash)
 
         assert len(alice_payment) > 0
@@ -59,12 +59,12 @@ class CoinTests(TestGroup):
 
     # Check that bob can spend the coin after the timeout.
     def test_bob_can_spend_later(self):
-        hwcoin, alice, bob = self.start_test()
+        time_coin, alice, bob = self.start_test()
         bob_start_balance = bob.balance()
 
         # Check that bob can spend after interval
         self.network.skip_time('5m')
-        res = bob.spend_coin(hwcoin, args=[bob.puzzle_hash])
+        res = bob.spend_coin(time_coin, args=[bob.puzzle_hash])
         bob_payment = res.find_standard_coins(bob.puzzle_hash)
         assert len(bob_payment) > 0
         assert bob.balance() >= bob_start_balance
