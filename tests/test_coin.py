@@ -49,13 +49,10 @@ class CoinTests(TestGroup):
         time_coin, alice, bob = self.start_test()
         alice_start_balance = alice.balance()
 
-        # Check that alice can spend before 2 days.
+        # Check that alice can spend before 60 seconds..
         res = alice.spend_coin(time_coin, args=[alice.puzzle_hash])
-        alice_payment = res.find_standard_coins(alice.puzzle_hash)
 
-        assert len(alice_payment) > 0
-        assert alice.balance() >= alice_start_balance
-        assert alice_payment[0].amount == self.coin_amount
+        assert alice.balance() == alice_start_balance + self.coin_amount
 
     # Check that bob can spend the coin after the timeout.
     def test_bob_can_spend_later(self):
@@ -66,5 +63,4 @@ class CoinTests(TestGroup):
         self.network.skip_time('5m')
         res = bob.spend_coin(time_coin, args=[bob.puzzle_hash])
         bob_payment = res.find_standard_coins(bob.puzzle_hash)
-        assert len(bob_payment) > 0
-        assert bob.balance() >= bob_start_balance
+        assert bob.balance() == bob_start_balance + self.coin_amount
