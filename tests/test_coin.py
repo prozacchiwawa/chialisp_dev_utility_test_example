@@ -39,7 +39,7 @@ class CoinTests(TestGroup):
         time_coin, alice, bob = self.start_test()
         bob_start_balance = bob.balance()
 
-        res = bob.spend_coin(time_coin)
+        res = bob.spend_coin(time_coin, args=[bob.puzzle_hash])
 
         assert res.error
         assert bob.balance() <= bob_start_balance
