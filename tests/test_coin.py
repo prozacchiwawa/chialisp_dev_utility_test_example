@@ -18,7 +18,9 @@ class CoinTests(TestGroup):
         # Load the contract and set alice and bob as the participants.
         coin_source = template_program.curry(
             alice.puzzle_hash,
+            alice.pk(),
             bob.puzzle_hash,
+            bob.pk(),
             self.coin_amount,
             60
         )
@@ -51,7 +53,9 @@ class CoinTests(TestGroup):
 
         # Check that alice can spend before 60 seconds..
         res = alice.spend_coin(time_coin, args=[alice.puzzle_hash])
+        alice_payment = res.find_standard_coins(alice.puzzle_hash)
 
+        assert len(alice_payment) > 0
         assert alice.balance() == alice_start_balance + self.coin_amount
 
     # Check that bob can spend the coin after the timeout.
@@ -63,4 +67,6 @@ class CoinTests(TestGroup):
         self.network.skip_time('5m')
         res = bob.spend_coin(time_coin, args=[bob.puzzle_hash])
         bob_payment = res.find_standard_coins(bob.puzzle_hash)
+
+        assert len(bob_payment) > 0
         assert bob.balance() == bob_start_balance + self.coin_amount
